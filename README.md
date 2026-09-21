@@ -143,8 +143,11 @@ WEBAPPS_REMOTE_PORT=22
 WEBAPPS_REMOTE_USER=root
 WEBAPPS_REMOTE_PASSWORD=<sama dengan BERKAS_REMOTE_PASSWORD>
 WEBAPPS_REMOTE_PATH=/opt/slemp/wwwroot/yatofa.net/webapps
-WEBAPPS_PUBLIC_BASE=http://192.168.1.78/webapps
+WEBAPPS_PUBLIC_BASE=https://simrs.rsiyatofa.co.id/webapps
 ```
+
+Untuk pemakaian **hanya di jaringan RS**, `WEBAPPS_PUBLIC_BASE` bisa diarahkan ke
+`http://192.168.1.78/webapps` (foto langsung dari storage, bukan lewat Django).
 
 ---
 
@@ -225,9 +228,22 @@ Struktur: `app/src/main/java/com/krisnapranata/tte/` — `data/` (DTO, Retrofit,
 
 ### 6.4 Build
 - Lokal (JDK 17): `./gradlew assembleDebug` → `app/build/outputs/apk/debug/app-debug.apk`;
-  `./gradlew assembleRelease` → `app/build/outputs/apk/release/app-release-unsigned.apk`.
+  `./gradlew assembleRelease` → `app-release-unsigned.apk` (tanpa keystore) atau
+  `app-release.apk` (signed, bila env keystore diisi).
 - GitHub Actions: `.github/workflows/build.yml` → `./gradlew assembleRelease`, artifact
-  `tte-release-apk`. Keystore release via GitHub Secrets bila diperlukan (belum dikonfigurasi).
+  `tte-release-apk`.
+
+### 6.5 Signing release
+- Keystore ada di luar repo (`~/keystores/tte-release.jks`); `*.jks`/`*.keystore` di-gitignore.
+- GitHub Secrets yang dipakai workflow: `KEYSTORE_BASE64`, `KEYSTORE_PASSWORD`, `KEY_ALIAS`,
+  `KEY_PASSWORD` — workflow men-decode keystore ke `$RUNNER_TEMP` sebelum build.
+- Build lokal signed:
+  ```bash
+  KEYSTORE_FILE=~/keystores/tte-release.jks \
+  KEYSTORE_PASSWORD=<pass> KEY_ALIAS=tte KEY_PASSWORD=<pass> \
+  ./gradlew assembleRelease
+  ```
+- Verifikasi: `apksigner verify --print-certs app/build/outputs/apk/release/app-release.apk`.
 
 ---
 

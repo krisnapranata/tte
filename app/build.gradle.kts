@@ -8,6 +8,15 @@ val tteApiBaseUrl: String =
     (project.findProperty("tteApiBaseUrl") as String?) ?: "http://10.0.2.2:8000/"
 val tteApiKey: String = (project.findProperty("tteApiKey") as String?) ?: "rahasia123"
 
+val keystoreFile: String? =
+    System.getenv("KEYSTORE_FILE") ?: (project.findProperty("tteKeystoreFile") as String?)
+val keystorePassword: String? =
+    System.getenv("KEYSTORE_PASSWORD") ?: (project.findProperty("tteKeystorePassword") as String?)
+val keyAliasName: String? =
+    System.getenv("KEY_ALIAS") ?: (project.findProperty("tteKeyAlias") as String?)
+val keyPasswordValue: String? =
+    System.getenv("KEY_PASSWORD") ?: (project.findProperty("tteKeyPassword") as String?)
+
 android {
     namespace = "com.krisnapranata.tte"
     compileSdk = 36
@@ -23,6 +32,17 @@ android {
         buildConfigField("String", "API_KEY", "\"$tteApiKey\"")
     }
 
+    signingConfigs {
+        if (keystoreFile != null && file(keystoreFile).exists()) {
+            create("release") {
+                storeFile = file(keystoreFile)
+                storePassword = keystorePassword
+                keyAlias = keyAliasName
+                keyPassword = keyPasswordValue
+            }
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -30,6 +50,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfigs.findByName("release")?.let { signingConfig = it }
         }
     }
 
