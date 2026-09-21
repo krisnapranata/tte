@@ -224,6 +224,8 @@ Struktur: `app/src/main/java/com/krisnapranata/tte/` — `data/` (DTO, Retrofit,
 - `gradle.properties`: `tteApiBaseUrl` (default `https://simrs.rsiyatofa.co.id/` untuk produksi;
   emulator: `http://10.0.2.2:8000/`) dan `tteApiKey` → menjadi `BuildConfig.API_BASE_URL` / `API_KEY`.
 - Di HP, alamat server bisa diubah dari layar login (mis. `http://192.168.1.176:8000/`) — tersimpan.
+- **Release HTTPS-only**: `usesCleartextTraffic` hanya aktif di build debug (`src/debug/AndroidManifest.xml`).
+  Di APK release, alamat server wajib `https://...`; HTTP hanya untuk debug/uji lokal.
 - Manifest mengizinkan cleartext HTTP karena server internal umumnya tanpa TLS.
 
 ### 6.4 Build
