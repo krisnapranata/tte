@@ -213,11 +213,13 @@ Struktur: `app/src/main/java/com/krisnapranata/tte/` — `data/` (DTO, Retrofit,
 2. Home — daftar 9 jenis surat
 3. Mode "Menunggu Ambi" — polling `GET /api/surat/antri/<jenis>/` tiap ±3 detik
    + tombol Refresh (perilaku sama seperti tombol Refresh di webapp)
-4. Layar KIE — teks per bagian (dibacakan perawat) + input: `umum` (`pengobatan_kepada`,
-   `nilai_kepercayaan`), `tindakan`/`dpjp` (radio Persetujuan/Penolakan + 11 checkbox)
-5. Kamera — CameraX → JPEG (dikompres maksimal 1600 px, kualitas 80) → base64
+4. Layar KIE — teks per bagian (dibacakan perawat) + input: `umum` (dropdown `pengobatan_kepada`
+   sesuai enum Khanza + `nilai_kepercayaan` maks. 50 huruf), `tindakan`/`dpjp`
+   (radio Persetujuan/Penolakan + 11 checkbox)
+5. Kamera — CameraX → JPEG (dikompres maksimal 1600 px, kualitas 80, **rotasi EXIF dikoreksi**) → base64
 6. TTD — signature pad (Canvas) → PNG (maksimal 800 px) → base64
 7. Kirim (foto + ttd) → status; POST `/api/surat/foto/` lalu `/api/surat/ttd/`
+   (jika foto berhasil tapi TTD gagal, pesan dibedakan)
 8. Preview PDF (opsional) — belum ada
 
 ### 6.3 Konfigurasi

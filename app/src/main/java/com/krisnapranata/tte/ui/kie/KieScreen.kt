@@ -1,5 +1,7 @@
 package com.krisnapranata.tte.ui.kie
 
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -9,10 +11,15 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
@@ -21,6 +28,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -28,6 +38,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.krisnapranata.tte.AppViewModel
 import com.krisnapranata.tte.JenisSurat
 import com.krisnapranata.tte.KONFIRMASI_TINDAKAN
+import com.krisnapranata.tte.PENGOBATAN_KEPADA
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -38,6 +49,8 @@ fun KieScreen(vm: AppViewModel) {
     val nilaiKepercayaan by vm.nilaiKepercayaan.collectAsStateWithLifecycle()
     val pilihan by vm.pilihan.collectAsStateWithLifecycle()
     val konfirmasi by vm.konfirmasi.collectAsStateWithLifecycle()
+
+    var dropdownPengobatan by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = { TopAppBar(title = { Text("KIE: ${JenisSurat.label(jenis)}") }) },
@@ -65,18 +78,48 @@ fun KieScreen(vm: AppViewModel) {
                 "umum" -> {
                     Text("Data Persetujuan", style = MaterialTheme.typography.titleMedium)
                     Spacer(Modifier.height(8.dp))
-                    OutlinedTextField(
-                        value = pengobatanKepada,
-                        onValueChange = vm::onPengobatanKepada,
-                        label = { Text("Pengobatan kepada") },
-                        singleLine = true,
-                        modifier = Modifier.fillMaxWidth(),
-                    )
+                    Box {
+                        OutlinedTextField(
+                            value = pengobatanKepada,
+                            onValueChange = {},
+                            readOnly = true,
+                            label = { Text("Pengobatan kepada") },
+                            trailingIcon = {
+                                Icon(
+                                    Icons.Default.ArrowDropDown,
+                                    contentDescription = "Pilih",
+                                )
+                            },
+                            singleLine = true,
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                        Box(
+                            Modifier
+                                .matchParentSize()
+                                .clickable { dropdownPengobatan = true }
+                        )
+                        DropdownMenu(
+                            expanded = dropdownPengobatan,
+                            onDismissRequest = { dropdownPengobatan = false },
+                        ) {
+                            PENGOBATAN_KEPADA.forEach { opsi ->
+                                DropdownMenuItem(
+                                    text = { Text(opsi) },
+                                    onClick = {
+                                        vm.onPengobatanKepada(opsi)
+                                        dropdownPengobatan = false
+                                    },
+                                )
+                            }
+                        }
+                    }
                     Spacer(Modifier.height(8.dp))
                     OutlinedTextField(
                         value = nilaiKepercayaan,
-                        onValueChange = vm::onNilaiKepercayaan,
-                        label = { Text("Nilai kepercayaan") },
+                        onValueChange = { teks ->
+                            if (teks.length <= 50) vm.onNilaiKepercayaan(teks)
+                        },
+                        label = { Text("Nilai kepercayaan (maks. 50 huruf)") },
                         modifier = Modifier.fillMaxWidth(),
                     )
                 }

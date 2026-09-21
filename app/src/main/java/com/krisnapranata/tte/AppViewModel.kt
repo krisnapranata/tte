@@ -53,6 +53,21 @@ val KONFIRMASI_TINDAKAN = listOf(
     "lain_lain_konfirmasi" to "Lain-lain",
 )
 
+val PENGOBATAN_KEPADA = listOf(
+    "Suami",
+    "Istri",
+    "Anak",
+    "Ayah",
+    "Ibu",
+    "Saudara",
+    "Keponakan",
+    "Adik",
+    "Kakak",
+    "Orang Tua",
+    "Diri Sendiri",
+    "-",
+)
+
 class AppViewModel(app: Application) : AndroidViewModel(app) {
 
     private val store = SessionStore(app)
@@ -89,7 +104,7 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
     private val _kie = MutableStateFlow<List<KieBagian>>(emptyList())
     val kie: StateFlow<List<KieBagian>> = _kie.asStateFlow()
 
-    private val _pengobatanKepada = MutableStateFlow("")
+    private val _pengobatanKepada = MutableStateFlow("Diri Sendiri")
     val pengobatanKepada: StateFlow<String> = _pengobatanKepada.asStateFlow()
 
     private val _nilaiKepercayaan = MutableStateFlow("")
@@ -277,6 +292,7 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
 
         viewModelScope.launch {
             _loading.value = true
+            var fotoTersimpan = false
             try {
                 val fields: Map<String, Any?>? = when (_jenis.value) {
                     "umum" -> mapOf(
@@ -294,11 +310,16 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
                 val client = api ?: throw IllegalStateException("Sesi belum siap")
                 val r1 = client.kirimFoto(FotoRequest(_jenis.value, key, foto, fields))
                 if (!r1.ok) throw IllegalStateException(r1.detail ?: "Gagal simpan foto")
+                fotoTersimpan = true
                 val r2 = client.kirimTtd(TtdRequest(_jenis.value, key, noRawat, ttd))
                 if (!r2.ok) throw IllegalStateException(r2.detail ?: "Gagal simpan TTD")
                 _status.value = "Berhasil dikirim"
             } catch (e: Exception) {
-                _status.value = "Gagal: ${errorMessage(e)}"
+                _status.value = if (fotoTersimpan) {
+                    "Foto tersimpan, TTD gagal: ${errorMessage(e)}"
+                } else {
+                    "Gagal: ${errorMessage(e)}"
+                }
             } finally {
                 _loading.value = false
                 _step.value = Step.HASIL
