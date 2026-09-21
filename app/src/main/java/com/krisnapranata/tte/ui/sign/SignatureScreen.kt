@@ -47,6 +47,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.krisnapranata.tte.AppViewModel
+import com.krisnapranata.tte.ui.scaleBitmap
 import java.io.ByteArrayOutputStream
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -137,7 +138,7 @@ fun SignatureScreen(vm: AppViewModel) {
                     onClick = {
                         val size = canvasSize
                         if (size.width == 0 || size.height == 0) return@Button
-                        val bitmap = renderSignature(size, paths.toList())
+                        val bitmap = scaleBitmap(renderSignature(size, paths.toList()), 800)
                         val bos = ByteArrayOutputStream()
                         bitmap.compress(Bitmap.CompressFormat.PNG, 100, bos)
                         vm.setTtd(Base64.encodeToString(bos.toByteArray(), Base64.NO_WRAP))

@@ -215,8 +215,8 @@ Struktur: `app/src/main/java/com/krisnapranata/tte/` — `data/` (DTO, Retrofit,
    + tombol Refresh (perilaku sama seperti tombol Refresh di webapp)
 4. Layar KIE — teks per bagian (dibacakan perawat) + input: `umum` (`pengobatan_kepada`,
    `nilai_kepercayaan`), `tindakan`/`dpjp` (radio Persetujuan/Penolakan + 11 checkbox)
-5. Kamera — CameraX → JPEG → base64
-6. TTD — signature pad (Canvas) → PNG → base64
+5. Kamera — CameraX → JPEG (dikompres maksimal 1600 px, kualitas 80) → base64
+6. TTD — signature pad (Canvas) → PNG (maksimal 800 px) → base64
 7. Kirim (foto + ttd) → status; POST `/api/surat/foto/` lalu `/api/surat/ttd/`
 8. Preview PDF (opsional) — belum ada
 

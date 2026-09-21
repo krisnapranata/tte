@@ -12,6 +12,7 @@ import com.krisnapranata.tte.data.Session
 import com.krisnapranata.tte.data.SessionStore
 import com.krisnapranata.tte.data.TteApi
 import com.krisnapranata.tte.data.TtdRequest
+import com.krisnapranata.tte.ui.errorMessage
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -198,7 +199,7 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
                 _hasilCari.value = tmp.cariPegawai(q)
                 _error.value = ""
             } catch (e: Exception) {
-                _error.value = "Gagal mencari: ${e.message}"
+                _error.value = "Gagal mencari: ${errorMessage(e)}"
             } finally {
                 _loading.value = false
             }
@@ -228,7 +229,7 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
                     _antri.value = api?.antri(_jenis.value)
                     _error.value = ""
                 } catch (e: Exception) {
-                    _error.value = "Gagal polling: ${e.message}"
+                    _error.value = "Gagal polling: ${errorMessage(e)}"
                 }
                 delay(3000)
             }
@@ -248,7 +249,7 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
                 _kie.value = res?.bagian ?: emptyList()
                 _step.value = Step.KIE
             } catch (e: Exception) {
-                _error.value = "Gagal ambil KIE: ${e.message}"
+                _error.value = "Gagal ambil KIE: ${errorMessage(e)}"
             } finally {
                 _loading.value = false
             }
@@ -297,7 +298,7 @@ class AppViewModel(app: Application) : AndroidViewModel(app) {
                 if (!r2.ok) throw IllegalStateException(r2.detail ?: "Gagal simpan TTD")
                 _status.value = "Berhasil dikirim"
             } catch (e: Exception) {
-                _status.value = "Gagal: ${e.message}"
+                _status.value = "Gagal: ${errorMessage(e)}"
             } finally {
                 _loading.value = false
                 _step.value = Step.HASIL

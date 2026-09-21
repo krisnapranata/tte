@@ -3,6 +3,7 @@ package com.krisnapranata.tte.ui.camera
 import android.Manifest
 import android.content.pm.PackageManager
 import android.util.Base64
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.CameraSelector
@@ -44,6 +45,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.krisnapranata.tte.AppViewModel
 import com.krisnapranata.tte.ui.base64ToBitmap
+import com.krisnapranata.tte.ui.compressJpeg
 import java.io.File
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -140,11 +142,11 @@ fun CameraScreen(vm: AppViewModel) {
                             override fun onImageSaved(
                                 outputFileResults: ImageCapture.OutputFileResults,
                             ) {
-                                val b64 = Base64.encodeToString(
-                                    file.readBytes(),
-                                    Base64.NO_WRAP,
+                                val compressed = compressJpeg(file.readBytes())
+                                Log.i("TTE", "foto terkompresi: ${compressed.size} bytes")
+                                vm.setFoto(
+                                    Base64.encodeToString(compressed, Base64.NO_WRAP)
                                 )
-                                vm.setFoto(b64)
                             }
 
                             override fun onError(exception: ImageCaptureException) {
